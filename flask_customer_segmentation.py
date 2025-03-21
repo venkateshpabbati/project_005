@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+import traceback
 
 # Load the saved models
 kmeans = joblib.load("kmeans_model.pkl")
@@ -41,8 +42,12 @@ def predict():
         
         return jsonify({'clusters': clusters.tolist()})
     except Exception as e:
-        return jsonify({'error': str(e)})
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': 'An internal error has occurred!'})
+
+import os
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
+    app.run(debug=debug_mode)
